@@ -1,14 +1,19 @@
 import React, {FC, useEffect, useState} from 'react';
 import './App.css';
 
-interface respI {
-    tracks: []
+interface RespI {
+    resp: object;
+    tracks: [];
+    children?: React.ReactNode
 }
 
-const App: FC<respI> = () => {
+
+
+const App: FC<RespI> = () => {
     const [loading, setLoading] = useState(true)
     const [rand, setRand] = useState<any>()
-    const [resp, setResp] = useState<any>()
+    const [resp, setResp] = useState<RespI>(Object)
+    const [listen, setListen] = useState<boolean>(false)
     useEffect(() => {
         fetch('artist.json', {
             method: 'GET',
@@ -23,31 +28,30 @@ const App: FC<respI> = () => {
                 setLoading(false)
             })
     }, [])
-
     const getTrack = () => {
         setRand(resp.tracks[Math.floor(Math.random() * 135)])
     }
     return (
         <div className="App">
-            <div className={"coolImg"}><img
+            <div className={"coolImg"} style={listen ? {  animation: '2s infinite linear coolImgSpin'} : {}}><img
                 src="https://i.pinimg.com/564x/aa/79/26/aa792605e63bc2e276bbdc1f4c7a6253.jpg" alt=""/></div>
             <div className="getTrackContainer">
                 <button onClick={() => {
+                    setListen(false)
                     getTrack()
                 }}>ХОЧЮ ТРЕК
                 </button>
                 <p>MORGENSHTERN - {!loading && rand.title}</p>
                 <div className="search">
                     <button
-                        onClick={() => window.open(`https://www.youtube.com/results?search_query=MORGENSHTERN+ - +${rand.title}`)}>
+                        onClick={() => setListen(!listen)
+                    }>
                         послушать???
                     </button>
                 </div>
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/cdk4hVPN_F0?autoplay=1"
-                        title="YouTube video player" frameBorder="0"
-                        allow="autoplay"
-                        allowFullScreen>
-                </iframe>
+                {listen && <iframe style={{border: 'none', width: '100%', height: '180px'}} width='100%' height='180'
+                                   allow='autoplay;'
+                                   src={`https://music.yandex.ru/iframe/#track/${!loading && rand.realId}/23812350`}></iframe>}
             </div>
         </div>
     );
